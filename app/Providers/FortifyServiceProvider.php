@@ -2,23 +2,16 @@
 
 namespace App\Providers;
 
-/* @chisel-registration */
 use App\Actions\Fortify\CreateNewUser;
-/* @end-chisel-registration */
 use App\Actions\Fortify\ResetUserPassword;
-/* @chisel-password-confirmation */
 use Illuminate\Auth\Middleware\RequirePassword;
-/* @end-chisel-password-confirmation */
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
-/* @chisel-password-confirmation */
 use Livewire\Livewire;
-
-/* @end-chisel-password-confirmation */
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -38,12 +31,9 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
-        /* @chisel-password-confirmation */
         $this->configurePasswordConfirmation();
-        /* @end-chisel-password-confirmation */
     }
 
-    /* @chisel-password-confirmation */
     /**
      * Require a recent password confirmation for Livewire requests from pages that require one.
      */
@@ -53,7 +43,6 @@ class FortifyServiceProvider extends ServiceProvider
             RequirePassword::class,
         ]);
     }
-    /* @end-chisel-password-confirmation */
 
     /**
      * Configure Fortify actions.
@@ -61,9 +50,7 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureActions(): void
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
-        /* @chisel-registration */
         Fortify::createUsersUsing(CreateNewUser::class);
-        /* @end-chisel-registration */
     }
 
     /**
@@ -72,18 +59,10 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureViews(): void
     {
         Fortify::loginView(fn () => view('pages::auth.login'));
-        /* @chisel-email-verification */
         Fortify::verifyEmailView(fn () => view('pages::auth.verify-email'));
-        /* @end-chisel-email-verification */
-        /* @chisel-2fa */
         Fortify::twoFactorChallengeView(fn () => view('pages::auth.two-factor-challenge'));
-        /* @end-chisel-2fa */
-        /* @chisel-password-confirmation */
         Fortify::confirmPasswordView(fn () => view('pages::auth.confirm-password'));
-        /* @end-chisel-password-confirmation */
-        /* @chisel-registration */
         Fortify::registerView(fn () => view('pages::auth.register'));
-        /* @end-chisel-registration */
         Fortify::resetPasswordView(fn () => view('pages::auth.reset-password'));
         Fortify::requestPasswordResetLinkView(fn () => view('pages::auth.forgot-password'));
     }
@@ -103,7 +82,6 @@ class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($throttleKey);
         });
 
-        /* @chisel-passkeys */
         RateLimiter::for('passkeys', function (Request $request) {
             $credentialId = $request->input('credential.id');
 
@@ -111,6 +89,5 @@ class FortifyServiceProvider extends ServiceProvider
                 ($credentialId ?: $request->session()->getId()).'|'.$request->ip(),
             );
         });
-        /* @end-chisel-passkeys */
     }
 }

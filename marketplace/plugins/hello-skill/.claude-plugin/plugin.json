@@ -1,0 +1,5 @@
+{
+  "name": "hello-skill",
+  "description": "Says hello and reports its version",
+  "version": "0.1.0"
+}

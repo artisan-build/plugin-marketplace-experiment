@@ -1,0 +1,12 @@
+{
+  "name": "artisan-poc",
+  "description": "PoC marketplace served from a per-user git URL",
+  "owner": { "name": "Artisan Build" },
+  "plugins": [
+    {
+      "name": "hello-skill",
+      "source": "./plugins/hello-skill",
+      "description": "Says hello and reports its version"
+    }
+  ]
+}

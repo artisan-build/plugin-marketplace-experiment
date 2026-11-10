@@ -13,15 +13,18 @@
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Platform')" class="grid">
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                        {{ __('Your marketplace') }}
                     </flux:sidebar.item>
+                    @if (auth()->user()->is_admin)
+                        <flux:sidebar.item icon="chart-bar" :href="route('marketplace.admin')" :current="request()->routeIs('marketplace.admin')" wire:navigate>Marketplace activity</flux:sidebar.item>
+                    @endif
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
             <flux:spacer />
 
             <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
+                <flux:sidebar.item icon="folder-git-2" href="https://github.com/artisan-build/plugin-marketplace-experiment" target="_blank">
                     {{ __('Repository') }}
                 </flux:sidebar.item>
 
