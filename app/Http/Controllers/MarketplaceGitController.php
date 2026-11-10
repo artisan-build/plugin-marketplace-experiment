@@ -20,7 +20,7 @@ class MarketplaceGitController extends Controller
         $file = $repo ? realpath($repo.'/'.$path) : false;
         $valid = $owner && ! $owner->revoked_at;
         $serve = $valid && $request->isMethod('GET') && $allowed && $file && str_starts_with($file, $repo.'/') && is_file($file);
-        $kind = ! $valid || ! $serve ? 'rejected' : match (true) {
+        $kind = ! $valid ? 'rejected' : match (true) {
             $path === 'info/refs' => 'check',
             str_ends_with($path, '.pack') => 'fetch',
             default => 'other',
@@ -30,7 +30,7 @@ class MarketplaceGitController extends Controller
             'token_id' => $owner?->id,
             'user_id' => $owner?->user_id,
             // Never record the credential-bearing URL, even for unknown tokens.
-            'path' => $path,
+            'path' => ltrim(explode('/marketplace.git', $request->getPathInfo(), 2)[1] ?? '', '/'),
             'query' => $request->getQueryString(),
             'kind' => $kind,
             'status' => $serve ? 200 : 404,

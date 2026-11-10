@@ -2,6 +2,8 @@
 
 Laravel 13 / Livewire 4 starter kit, Pest, one marketplace (`artisan-poc`), one skill-only plugin (`hello-skill`). This **public** repository contains only demonstration content, not credentials or client skills. The token endpoint is an attribution experiment, not DRM: the same demo source is public here and installed skills remain cached after revocation.
 
+**Observed blocker:** Claude Code 2.1.322 cannot add this dumb-HTTP URL: its shallow clone fails with `fatal: dumb http transport does not support shallow capabilities`. Ordinary public HTTPS Git clone succeeds. The PoC preserves the specified transport rather than silently adding smart HTTP. See the evidence and recommendation in [test results](docs/test-results.md). Desktop remains untested.
+
 ## Local setup
 
 Requires PHP 8.4+, Composer, Node 22+, and Git. Install Claude Code for manifest validation (`npm install -g @anthropic-ai/claude-code`).
@@ -26,7 +28,7 @@ Seeded logins: configured admin, `cli@example.invalid`, `mac@example.invalid`, `
 
 `storage/app/marketplace.git` is an atomically switched symlink to an immutable sibling release directory. `storage/app/marketplace.sha` contains HEAD; the controller reads the release-local SHA to avoid a metadata race. Old directories remain until the image is replaced, allowing in-flight file responses to finish. Build output must stay outside the public webroot. Build and runtime must preserve the same absolute app path and symlinks.
 
-The read-only `/m/{token}/marketplace.git/{path}` route is outside `web` middleware. It has no sessions, cookies, CSRF challenges, Git backend, or push operation. The allowlist is exactly HEAD, refs, pack list, SHA-1 pack/index files, and loose objects. The smart-HTTP discovery query gets plain refs, allowing Git to fall back to dumb HTTP. Other methods/paths get 404 and are logged. There is no shallow-clone support in dumb HTTP.
+The read-only `/m/{token}/marketplace.git/{path}` route is outside `web` middleware. Laravel starts no sessions or cookies and adds no CSRF challenges, Git backend, or push operation. Cloud's edge may independently set a `__cf_bm` cookie; the successful Git clone did not need a browser challenge. The allowlist is exactly HEAD, refs, pack list, SHA-1 pack/index files, and loose objects. The smart-HTTP discovery query gets plain refs, allowing ordinary Git to fall back to dumb HTTP. Other methods/paths get 404 and are logged, including the raw encoded relative path. Unknown/revoked credentials are classified `rejected`; valid credentials use `check` / `fetch` / `other` by path even on 404. There is no shallow-clone support in dumb HTTP.
 
 Tokens have 256 bits of entropy, a unique SHA-256 lookup hash and a Laravel-encrypted recoverable value. Regeneration revokes all old active tokens for that user inside a transaction. Keep `APP_KEY` stable; losing it prevents redisplaying issued URLs. Browser token pages are no-store/no-referrer. No token value is written to application request rows; path is relative to the credential-bearing repo root. Hosting/edge access logs and client Git configs may still contain full URLs: restrict their access and redact URLs before sharing diagnostics. Failed requests retain the owner when recognizable, including revoked tokens. Unknown credentials have no owner.
 

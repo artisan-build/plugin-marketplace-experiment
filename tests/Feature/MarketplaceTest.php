@@ -44,6 +44,7 @@ it('rejects revoked and unknown credentials while preserving known ownership', f
 
 it('rejects traversal and non-allowlisted files', function (string $path) {
     $this->get($this->base.$path)->assertNotFound();
+    $this->assertDatabaseHas('marketplace_requests', ['path' => $path, 'status' => 404, 'kind' => 'other']);
 })->with(['../config', '%2e%2e/config', '%252e%252e/config', 'objects/../../config', 'objects%2f..%2f..%2fconfig', 'config', 'hooks/pre-receive', 'marketplace.sha', 'info/refs/extra']);
 
 it('classifies pack downloads and serves pack and index MIME types', function () {
